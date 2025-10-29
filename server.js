@@ -24,7 +24,7 @@ app.post("/create_preference", async (req, res) => {
         },
       ],
       back_urls: {
-        success: "http://127.0.0.1:5500/index.html",
+        success: "https://lojascript.netlify.app/",
         failure: "http://localhost:5500/erro.html",
       },
       auto_return: "approved",
