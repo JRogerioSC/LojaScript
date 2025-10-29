@@ -1,1 +1,157 @@
-<h1>Cartao,pix,Aqui</h1>
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Formulário de Pagamento</title>
+    <style>
+        body {
+            font-family: "Poppins", sans-serif;
+            background: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #444;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+
+        .pagamento-tipo {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .pagamento-tipo label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .botao {
+            width: 100%;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .botao:hover {
+            background: #0056b3;
+        }
+
+        .cartao-info,
+        .pix-info {
+            display: none;
+        }
+
+        .ativo {
+            display: block;
+        }
+
+        .pix-codigo {
+            background: #f6f6f6;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-family: monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Pagamento</h2>
+
+        <div class="pagamento-tipo">
+            <label><input type="radio" name="tipo" value="cartao" checked> Cartão</label>
+            <label><input type="radio" name="tipo" value="pix"> PIX</label>
+        </div>
+
+        <!-- Pagamento via Cartão -->
+        <form class="cartao-info ativo">
+            <label>Nome no Cartão</label>
+            <input type="text" placeholder="Ex: Maria Souza" required />
+
+            <label>Número do Cartão</label>
+            <input type="text" placeholder="0000 0000 0000 0000" maxlength="19" required />
+
+            <label>Validade</label>
+            <input type="month" required />
+
+            <label>CVV</label>
+            <input type="text" placeholder="123" maxlength="4" required />
+
+            <button type="submit" class="botao">Pagar com Cartão</button>
+        </form>
+
+        <!-- Pagamento via PIX -->
+        <form class="pix-info">
+            <p>Escaneie o código abaixo com seu app bancário:</p>
+            <div class="pix-codigo">
+                <p><strong>Chave PIX:</strong></p>
+                <p>pagamentos@empresa.com.br</p>
+            </div>
+            <button type="submit" class="botao">Confirmar Pagamento PIX</button>
+        </form>
+    </div>
+
+    <script>
+        const radios = document.querySelectorAll('input[name="tipo"]');
+        const cartaoInfo = document.querySelector('.cartao-info');
+        const pixInfo = document.querySelector('.pix-info');
+
+        radios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                if (radio.value === 'cartao') {
+                    cartaoInfo.classList.add('ativo');
+                    pixInfo.classList.remove('ativo');
+                } else {
+                    pixInfo.classList.add('ativo');
+                    cartaoInfo.classList.remove('ativo');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
