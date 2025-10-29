@@ -18,7 +18,7 @@ router.post("/cartao", async (req, res) => {
 
     const payment_data = {
       transaction_amount: Number(valor || 20),
-      token: "TEST-12345", // Em produção: card_token vindo do frontend
+      token: "APP_USR-1880190853276281-102914-e7a0ba9bafda17670016114897e52552-175408884", // Em produção: card_token vindo do frontend
       description: "Compra LojaScript - ex: Volkswagen Fox",
       installments: 1,
       payment_method_id: "visa", // ou detectado dinamicamente

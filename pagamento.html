@@ -37,7 +37,7 @@
             display: block;
             font-weight: 600;
             margin-bottom: 6px;
-            color: #444
+            color: #444;
         }
 
         input {
@@ -46,7 +46,7 @@
             border: 1px solid #ccc;
             border-radius: 6px;
             margin-bottom: 12px;
-            font-size: 15px
+            font-size: 15px;
         }
 
         .pagamento-tipo {
@@ -55,7 +55,7 @@
             margin-bottom: 14px;
             background: #f8f8f8;
             padding: 10px;
-            border-radius: 8px
+            border-radius: 8px;
         }
 
         .pagamento-tipo label {
@@ -63,7 +63,7 @@
             gap: 8px;
             align-items: center;
             cursor: pointer;
-            font-weight: 600
+            font-weight: 600;
         }
 
         .botao {
@@ -75,26 +75,26 @@
             border-radius: 6px;
             font-weight: 700;
             cursor: pointer;
-            margin-top: 6px
+            margin-top: 6px;
         }
 
         .botao.green {
-            background: #28a745
+            background: #28a745;
         }
 
-        .pix-area {
+        .pix-info,
+        .cartao-info {
             display: none;
-            text-align: center
         }
 
         .ativo {
-            display: block
+            display: block;
         }
 
         .qr-img {
             max-width: 260px;
             margin: 10px auto;
-            display: block
+            display: block;
         }
 
         .info {
@@ -103,16 +103,17 @@
             padding: 10px;
             border-radius: 8px;
             margin-bottom: 12px;
-            border: 1px dashed #007bff
+            border: 1px dashed #007bff;
+            word-wrap: break-word;
         }
 
         .row {
             display: flex;
-            gap: 10px
+            gap: 10px;
         }
 
         .half {
-            flex: 1
+            flex: 1;
         }
 
         .voltar {
@@ -121,7 +122,7 @@
             margin-top: 12px;
             text-decoration: none;
             color: #007bff;
-            font-weight: 600
+            font-weight: 600;
         }
     </style>
 </head>
@@ -155,8 +156,7 @@
                 </div>
             </div>
 
-            <input id="valor-cartao" type="number" placeholder="Valor (R$)" value="20" step="0.01"
-                style="margin-bottom:8px" required>
+            <input id="valor-cartao" type="number" placeholder="Valor (R$)" value="20" step="0.01" required>
 
             <button type="submit" class="botao">Pagar com Cartão</button>
         </form>
@@ -174,12 +174,14 @@
     </div>
 
     <script>
-        const API_BASE = "/api/pagamento"; // se backend estiver num domínio, troque pela URL completa (ex: https://meu-backend.onrender.com/api/pagamento)
+        // ✅ URL completa do backend (ajuste se estiver na Render)
+        const API_BASE = "http://localhost:3000/api/pagamento";
+
         const radios = document.querySelectorAll('input[name="tipo"]');
         const cartaoInfo = document.querySelector('.cartao-info');
         const pixInfo = document.querySelector('.pix-info');
 
-        // Alternância
+        // Alternância entre cartão e PIX
         radios.forEach(r => r.addEventListener('change', () => {
             if (r.checked && r.value === 'cartao') {
                 cartaoInfo.classList.add('ativo');
@@ -191,13 +193,13 @@
             }
         }));
 
-        // Máscara cartão
+        // Máscara do número do cartão
         const numeroCartao = document.getElementById('numero-cartao');
         numeroCartao.addEventListener('input', e => {
             e.target.value = e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim();
         });
 
-        // ---------- CARTÃO: enviar para backend (exemplo/sandbox) ----------
+        // Enviar dados do cartão (simulação sandbox)
         document.querySelector('.cartao-info').addEventListener('submit', async (e) => {
             e.preventDefault();
             const nome = document.getElementById('nome-cartao').value;
@@ -206,7 +208,6 @@
             const cvv = document.getElementById('cvv').value;
             const valor = document.getElementById('valor-cartao').value;
 
-            // Em produção: gere um card_token no cliente com Mercado Pago SDK e envie SOMENTE o token ao backend.
             try {
                 const resp = await fetch(`${API_BASE}/cartao`, {
                     method: "POST",
@@ -217,15 +218,15 @@
                 if (data.status === "ok") {
                     alert("✅ Pagamento com cartão processado (sandbox). ID: " + data.id);
                 } else {
-                    alert("Erro cartão: " + (data.error || JSON.stringify(data)));
+                    alert("❌ Erro no cartão: " + (data.error || JSON.stringify(data)));
                 }
             } catch (err) {
                 console.error(err);
-                alert("Erro ao comunicar com o servidor.");
+                alert("❌ Erro ao comunicar com o servidor.");
             }
         });
 
-        // ---------- PIX: gerar QR e exibir ----------
+        // PIX
         const pixChaveEl = document.getElementById('pix-chave');
         const pixImgEl = document.getElementById('pix-qr');
         const copiarBtn = document.getElementById('copiar-btn');
@@ -235,29 +236,28 @@
             try {
                 gerarPixBtn.disabled = true;
                 gerarPixBtn.textContent = "Gerando...";
-                // envia valor opcional
                 const resp = await fetch(`${API_BASE}/pix`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ valor: 20.0, descricao: "Compra LojaScript - Volkswagen Fox" })
                 });
                 const data = await resp.json();
+
                 if (data.status === "ok") {
                     if (data.qr_code_base64) {
                         pixImgEl.src = "data:image/png;base64," + data.qr_code_base64;
                         pixImgEl.style.display = "block";
                     } else pixImgEl.style.display = "none";
 
-                    // qr_code é a string para pagamento (chave longa)
-                    pixChaveEl.textContent = data.qr_code || "Chave PIX: (não disponível)";
+                    pixChaveEl.textContent = data.qr_code || "Chave PIX indisponível";
                     copiarBtn.disabled = false;
-                    alert("⚡ PIX gerado! Escaneie ou copie a chave.");
+                    alert("⚡ PIX gerado com sucesso!");
                 } else {
                     alert("Erro ao gerar PIX: " + (data.error || JSON.stringify(data)));
                 }
             } catch (err) {
                 console.error(err);
-                alert("Erro ao gerar PIX no servidor.");
+                alert("❌ Erro ao gerar PIX no servidor.");
             } finally {
                 gerarPixBtn.disabled = false;
                 gerarPixBtn.textContent = "Gerar QR PIX";
@@ -268,13 +268,12 @@
         copiarBtn.addEventListener('click', () => {
             const txt = pixChaveEl.textContent;
             navigator.clipboard.writeText(txt);
-            alert("Chave PIX copiada!");
+            alert("📋 Chave PIX copiada!");
         });
 
-        // Inicialmente, esconder/mostrar conforme radio
-        if (document.querySelector('input[name="tipo"]:checked').value === 'cartao') {
-            cartaoInfo.classList.add('ativo'); pixInfo.classList.remove('ativo');
-        } else { pixInfo.classList.add('ativo'); cartaoInfo.classList.remove('ativo'); }
+        // Inicializa com o cartão visível
+        cartaoInfo.classList.add('ativo');
+        pixInfo.classList.remove('ativo');
     </script>
 </body>
 
